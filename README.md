@@ -44,7 +44,20 @@ Adjust the connection command to match your setup (e.g., MySQL, SQLite, etc.).
 
 ## Results
 
-_Add a short summary of what your analysis found here — for example, the number of providers flagged, patterns identified, or key statistics. Keep these truthful to what your queries actually produced._
+Running the SQL queries produces ranked lists of providers and procedures
+that stand out from normal patterns:
+
+- The provider utilization query ranks providers by claim and procedure
+  volume, surfacing those whose activity is well above their peer group.
+- The imaging overutilization query highlights repeated or excessive
+  high-cost imaging that may indicate overbilling.
+- The fraud-pattern queries flag records matching known fraud indicators
+  such as duplicate or improbable billing.
+
+These outputs give a prioritized shortlist of high-risk cases for manual review.
+
+
+
 
 ## Author
 
