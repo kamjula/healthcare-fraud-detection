@@ -1,0 +1,47 @@
+# Configurable rule-based fraud detection rules.
+# Each rule produces a flag (0/1) and contributes `weight` to the rule score.
+# Thresholds are intentionally conservative defaults — tune to your population.
+
+rules:
+  imaging_overutilization:
+    description: >
+      Provider bills imaging procedures (radiology CPT 70000-79999) at a rate
+      far above their specialty peers. Primary fraud signal in this project.
+    weight: 3.0
+    params:
+      imaging_ratio_threshold: 0.45      # share of a provider's claims that are imaging
+      min_claims: 20                     # only evaluate providers with enough volume
+
+  high_billed_amount:
+    description: Single claim billed far above the median for its CPT code.
+    weight: 2.0
+    params:
+      multiple_of_cpt_median: 4.0
+
+  excessive_units:
+    description: Number of units on a claim exceeds a clinically plausible cap.
+    weight: 2.0
+    params:
+      max_units: 12
+
+  duplicate_billing:
+    description: >
+      Same patient, provider, CPT code and date appears more than once
+      (potential double billing).
+    weight: 2.5
+    params: {}
+
+  upcoding_amount_vs_paid:
+    description: >
+      Billed amount is far higher than paid amount repeatedly for a provider,
+      suggesting inflated charges.
+    weight: 1.5
+    params:
+      billed_to_paid_ratio: 3.0
+      min_claims: 20
+
+scoring:
+  # Final risk = ml_weight * ml_probability + rule_weight * normalized_rule_score
+  ml_weight: 0.6
+  rule_weight: 0.4
+  flag_threshold: 0.5    # final risk score above this is flagged for review
