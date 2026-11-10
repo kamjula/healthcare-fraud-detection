@@ -86,5 +86,5 @@ This project mirrors workflows used in production by:
 ---
 ## 👩‍💻 Author
 
-**Sravani Kamjula** | Data Scientist · Applied AI & Data Systems
-[LinkedIn](https://www.linkedin.com/in/sravani-kamjula-763285176/) · [Portfolio](https://sravaniportfoli.netlify.app/)
+**Sravani Kamjula** · AI/ML Engineer
+[LinkedIn](https://www.linkedin.com/in/sravani-kamjula/) · [Portfolio](https://sravaniportfoli.netlify.app/)
