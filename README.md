@@ -1,90 +1,119 @@
-# 🏥 Healthcare Fraud Detection — SQL & Python Claims Analytics
+# Healthcare Fraud Detection — Hybrid Rules + ML Claims Risk Scoring
 
-A **SQL + Python analytics project** that detects fraudulent patterns in healthcare claims data — modeled after real-world compliance analytics used by CMS and insurance payers to surface high-risk providers for audit review.
+A portfolio implementation of a **hybrid rule-based and machine-learning workflow** for prioritizing potentially suspicious healthcare claims for human review.
 
-Healthcare fraud — including overbilling, phantom billing, and imaging overutilization — costs the U.S. healthcare system **billions of dollars annually**. This project uses statistical SQL-based analysis to flag anomalies in provider behavior and procedure volumes, with Python for deeper investigation of flagged cases.
+The repository uses **synthetic claims only**. It does not contain PHI and does not claim production fraud-detection accuracy.
 
----
+![System architecture](images/system-architecture.png)
 
-## 🔍 Key Analyses
+## What is actually implemented
 
-| Analysis | What It Detects |
-|---|---|
-| 📊 **Provider Utilization** | Ranks providers by claim/procedure volume, surfacing those significantly above peer benchmarks |
-| 🖼️ **Imaging Overutilization** | Flags repeated or excessive high-cost imaging that may indicate overbilling |
-| 🚩 **Fraud-Pattern Queries** | Identifies duplicate billing, improbable procedure volumes, and known fraud indicators |
+- Synthetic claims generator with injected suspicious patterns
+- Feature engineering at claim/provider level
+- Configurable YAML fraud rules
+- XGBoost classifier training and persisted model artifact
+- Hybrid score combining ML probability and rule score
+- Claim-level investigation CLI explaining why a record was flagged
+- PostgreSQL schema and analytical SQL
+- Dockerfile and one-command demo script
+- pytest test suite
 
-### Fraud Patterns Detected
-- **Overbilling** — claims exceeding typical procedure rates or peer volumes
-- **Phantom billing** — procedures billed but not clinically supported
-- **Duplicate charges** — same procedure billed multiple times for same patient/date
-- **Imaging overuse** — excessive MRI/CT scans relative to diagnosis codes
-- **Provider outliers** — volume far above the statistical norm for specialty/region
----
-## 🛠 Tech Stack
+## Detection flow
 
+```text
+Synthetic claims
+      │
+      v
+Validation / preparation
+      │
+      v
+Feature engineering
+      │
+      ├──────────────> Configurable rules
+      │
+      └──────────────> XGBoost classifier
+                         │
+                         v
+              Hybrid risk score
+                         │
+                         v
+              Human-review shortlist
 ```
-SQL (PostgreSQL) · Python (Pandas) · Statistical Anomaly Detection · Relational Schema Design
+
+## Risk scoring
+
+```text
+final_risk_score = ml_weight * ml_probability
+                 + rule_weight * rule_score
 ```
 
-| Layer | Technology |
-|---|---|
-| Schema & queries | PostgreSQL / SQL |
-| Investigation | Python + Pandas |
-| Detection method | Statistical outlier analysis + rule-based fraud flags |
+Thresholds and weights are stored in `config/fraud_rules.yaml`, so scoring behavior can be changed without editing model code.
 
----
+## Repository layout
 
-## 📁 Project Structure
+The runnable implementation lives in the nested project directory:
 
-```
+```text
 healthcare-fraud-detection/
-├── sql/
-│   ├── 01_schema.sql               # Table definitions / database schema
-│   ├── 02_load_data.sql            # Load claims data into tables
-│   ├── 03_fraud_queries.sql        # Core fraud-detection queries
-│   ├── provider_utilization.sql    # Provider-level utilization analysis
-│   ├── imaging_overutilization.sql # Detection of imaging procedure overuse
-│   └── schema.sql                  # Schema reference
-└── src/
-    └── investigate.py              # Python script to investigate flagged records
+├── images/
+│   └── system-architecture.png
+└── healthcare-fraud-detection/
+    ├── config/
+    ├── data/
+    ├── models/
+    ├── scripts/
+    ├── sql/
+    ├── src/
+    ├── tests/
+    ├── Dockerfile
+    └── requirements.txt
 ```
 
----
-
-## 🚀 How to Run
+## Run the demo
 
 ```bash
-# 1. Create schema and load data
-psql -d your_database -f sql/01_schema.sql
-psql -d your_database -f sql/02_load_data.sql
+git clone https://github.com/kamjula/healthcare-fraud-detection.git
+cd healthcare-fraud-detection/healthcare-fraud-detection
 
-# 2. Run fraud-detection queries
-psql -d your_database -f sql/03_fraud_queries.sql
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 
-# 3. Investigate flagged records
-python src/investigate.py
+bash scripts/run_demo.sh
 ```
 
----
+Or run individual stages:
 
-## 📊 Sample Results
+```bash
+python -m src.data.generate_synthetic
+python -m src.pipeline --train
+python -m src.investigate --claim-id CLM00001234
+```
 
-Running the SQL queries produces ranked outputs for compliance review:
+Run tests:
 
-- **Provider utilization query** — ranks providers by claim and procedure volume, surfacing those whose activity is well above their peer group
-- **Imaging overutilization query** — highlights repeated or excessive high-cost imaging that may indicate systematic overbilling
-- **Fraud-pattern queries** — flags records matching known fraud indicators such as duplicate or improbable billing
-These outputs give a **prioritized shortlist of high-risk cases** for manual review by compliance teams.
----
-## 💡 Real-World Relevance
+```bash
+pytest -q
+```
 
-This project mirrors workflows used in production by:
-- **CMS (Centers for Medicare & Medicaid Services)** fraud analytics
-- **Insurance payer** provider credentialing and audit teams
-- **Healthcare compliance** departments running utilization management
----
-## 👩‍💻 Author
+## Important evaluation note
 
-**Sravani Kamjula** · AI/ML Engineer
+The synthetic generator intentionally creates separable fraud patterns, so the model can report a near-perfect ROC-AUC on that generated dataset.
+
+That number is **not presented as real-world model performance**. On real claims, labels are noisy and scarce, data leakage is a serious risk, and proper temporal/external validation would be required.
+
+## Stack
+
+Python · Pandas · NumPy · scikit-learn · XGBoost · PyYAML · PostgreSQL · Docker · pytest
+
+## Scope and limitations
+
+- Synthetic data only
+- Statistical/rule/model outputs are prioritization signals, not proof of fraud
+- No clinical or payment decision should be made from this portfolio system
+- Real claims would require HIPAA controls, access restrictions, audit logging, and a stronger validation strategy
+
+## Author
+
+**Sravani Kamjula** · AI/ML Engineer  
 [LinkedIn](https://www.linkedin.com/in/sravani-kamjula/) · [Portfolio](https://sravaniportfoli.netlify.app/)
