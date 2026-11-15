@@ -23,10 +23,9 @@ healthcare-fraud-detection/
 ├── README.md
 ├── requirements.txt
 ├── Dockerfile
-├── .dockerignore / .gitignore / .env.example
 ├── config/
 │   └── fraud_rules.yaml          # thresholds + scoring weights
-├── data/                         # generated CSVs (gitignored)
+├── data/                         # sample and generated CSVs
 ├── sql/
 │   ├── 01_schema.sql             # claims / providers / scores tables
 │   ├── 02_load_data.sql          # load the synthetic CSV
@@ -111,7 +110,7 @@ An `is_fraud` column (provider- or claim-level label) is only needed to
   noisy, labels are scarce and unreliable, and performance is far lower. Treat
   the metric as a wiring check, not a result to quote.
 - Before using real claims data, handle PHI per HIPAA: keep raw data out of
-  version control (already in `.gitignore`), restrict access, and add audit
+  version control, restrict access, and add audit
   logging.
 
 ## Tech stack
