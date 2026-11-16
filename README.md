@@ -53,29 +53,36 @@ Thresholds and weights are stored in `config/fraud_rules.yaml`, so scoring behav
 
 ## Repository layout
 
-The runnable implementation lives in the nested project directory:
-
 ```text
 healthcare-fraud-detection/
-├── images/
-│   └── system-architecture.png
-└── healthcare-fraud-detection/
-    ├── config/
-    ├── data/
-    ├── models/
-    ├── scripts/
-    ├── sql/
-    ├── src/
-    ├── tests/
-    ├── Dockerfile
-    └── requirements.txt
+├── config/fraud_rules.yaml       # rule thresholds and scoring weights
+├── scripts/run_demo.sh           # one-command demo
+├── sql/                          # PostgreSQL schema, data load, and the rules in SQL
+├── src/
+│   ├── config.py                 # paths and rules loader
+│   ├── data/
+│   │   ├── generate_synthetic.py # synthetic claims with injected fraud patterns
+│   │   └── prepare.py            # validation and cleaning
+│   ├── features/engineer.py      # claim- and provider-level features
+│   ├── rules/engine.py           # rule-based detection
+│   ├── models/
+│   │   ├── train.py              # XGBoost training
+│   │   └── score.py              # ML probability + hybrid score
+│   ├── pipeline.py               # end-to-end CLI
+│   └── investigate.py            # single-claim drill-down CLI
+├── tests/                        # pytest unit tests
+├── images/system-architecture.png
+├── Dockerfile
+└── requirements.txt
 ```
+
+`data/` and `models/` are created when the demo runs; the generated CSVs and model file are not committed.
 
 ## Run the demo
 
 ```bash
 git clone https://github.com/kamjula/healthcare-fraud-detection.git
-cd healthcare-fraud-detection/healthcare-fraud-detection
+cd healthcare-fraud-detection
 
 python -m venv .venv
 source .venv/bin/activate
@@ -87,16 +94,34 @@ bash scripts/run_demo.sh
 Or run individual stages:
 
 ```bash
-python -m src.data.generate_synthetic
-python -m src.pipeline --train
+python -m src.data.generate_synthetic     # writes data/sample_claims.csv
+python -m src.pipeline --train            # trains the model, writes data/scored_claims.csv
 python -m src.investigate --claim-id CLM00001234
+```
+
+Run with Docker:
+
+```bash
+docker build -t fraud-detection .
+docker run --rm -v "$(pwd)/data:/app/data" fraud-detection
 ```
 
 Run tests:
 
 ```bash
-pytest -q
+python -m pytest -q
 ```
+
+## Using your own data
+
+Replace the generator output with a CSV that has these columns:
+
+```text
+claim_id, provider_id, npi, provider_specialty, patient_id,
+cpt_code, icd10_code, claim_date, units, billed_amount, paid_amount
+```
+
+An `is_fraud` label is only needed to train the model; the rule engine runs without it.
 
 ## Important evaluation note
 
