@@ -1,10 +1,10 @@
-# Healthcare Fraud Detection — Hybrid Rules + ML Claims Risk Scoring
+# Healthcare Fraud Detection: Hybrid Rules + ML Claims Risk Scoring
 
 [![CI](https://github.com/kamjula/healthcare-fraud-detection/actions/workflows/ci.yml/badge.svg)](https://github.com/kamjula/healthcare-fraud-detection/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
-A portfolio implementation of a **hybrid rule-based and machine-learning workflow** for prioritizing potentially suspicious healthcare claims for human review.
+A **hybrid rule-based and machine-learning workflow** for prioritizing potentially suspicious healthcare claims for human review.
 
-The repository uses **synthetic claims only**. It does not contain PHI and does not claim production fraud-detection accuracy.
+The repository uses **synthetic claims only**. It contains no PHI, and its model metrics do not represent production fraud-detection accuracy.
 
 ![System architecture](images/system-architecture.png)
 
@@ -127,7 +127,7 @@ An `is_fraud` label is only needed to train the model; the rule engine runs with
 
 The synthetic generator intentionally creates separable fraud patterns, so the model can report a near-perfect ROC-AUC on that generated dataset.
 
-That number is **not presented as real-world model performance**. On real claims, labels are noisy and scarce, data leakage is a serious risk, and proper temporal/external validation would be required.
+That number does **not** reflect real-world model performance. On real claims, labels are noisy and scarce, data leakage is a serious risk, and proper temporal/external validation would be required.
 
 ## Stack
 
@@ -137,7 +137,7 @@ Python · Pandas · NumPy · scikit-learn · XGBoost · PyYAML · PostgreSQL · 
 
 - Synthetic data only
 - Statistical/rule/model outputs are prioritization signals, not proof of fraud
-- No clinical or payment decision should be made from this portfolio system
+- No clinical or payment decision should be made from this system
 - Real claims would require HIPAA controls, access restrictions, audit logging, and a stronger validation strategy
 
 ## Author
