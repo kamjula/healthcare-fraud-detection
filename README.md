@@ -1,5 +1,7 @@
 # Healthcare Fraud Detection — Hybrid Rules + ML Claims Risk Scoring
 
+[![CI](https://github.com/kamjula/healthcare-fraud-detection/actions/workflows/ci.yml/badge.svg)](https://github.com/kamjula/healthcare-fraud-detection/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+
 A portfolio implementation of a **hybrid rule-based and machine-learning workflow** for prioritizing potentially suspicious healthcare claims for human review.
 
 The repository uses **synthetic claims only**. It does not contain PHI and does not claim production fraud-detection accuracy.
