@@ -11,9 +11,6 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: healthcare-fraud-detection
     steps:
       - uses: actions/checkout@v4
 
@@ -21,7 +18,7 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
-          cache-dependency-path: healthcare-fraud-detection/requirements.txt
+          cache-dependency-path: requirements.txt
 
       - name: Install dependencies
         run: pip install -r requirements.txt
